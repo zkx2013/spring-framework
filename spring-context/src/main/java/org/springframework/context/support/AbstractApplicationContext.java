@@ -154,6 +154,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	static {
 		// Eagerly load the ContextClosedEvent class to avoid weird classloader issues
 		// on application shutdown in WebLogic 8.1. (Reported by Dustin Woods.)
+		/**
+		 * 尽早初始化Spring 上下文关闭事件对象
+		 */
 		ContextClosedEvent.class.getName();
 	}
 
