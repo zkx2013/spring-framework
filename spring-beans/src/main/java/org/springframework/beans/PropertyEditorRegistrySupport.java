@@ -138,6 +138,9 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	/**
 	 * Activate the default editors for this registry instance,
 	 * allowing for lazily registering default editors when needed.
+	 *
+	 * 激活这个注册表实例的默认编辑器,允许在需要时延迟注册默认编辑器。
+	 *
 	 */
 	protected void registerDefaultEditors() {
 		this.defaultEditorsActive = true;
@@ -149,6 +152,11 @@ public class PropertyEditorRegistrySupport implements PropertyEditorRegistry {
 	 * <p>Those editors are not registered by default simply because they are in
 	 * general inappropriate for data binding purposes. Of course, you may register
 	 * them individually in any case, through {@link #registerCustomEditor}.
+	 *
+	 * 激活仅用于配置目的的配置值编辑器。
+	 * 例如{@link org.springframework.beans.propertyeditors.StringArrayPropertyEditor}。
+	 * 这些编辑器默认情况下没有注册，因为它们通常不适合用于数据绑定目的。当然，在任何情况下都可以通过{@link #registerCustomEditor}分别注册它们。
+	 *
 	 */
 	public void useConfigValueEditors() {
 		this.configValueEditorsActive = true;

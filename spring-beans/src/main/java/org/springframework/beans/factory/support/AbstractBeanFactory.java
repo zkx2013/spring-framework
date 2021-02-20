@@ -127,10 +127,12 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	private boolean cacheBeanMetadata = true;
 
 	/** Resolution strategy for expressions in bean definition values. */
+	/** bean定义值中表达式的解析策略 */
 	@Nullable
 	private BeanExpressionResolver beanExpressionResolver;
 
 	/** Spring ConversionService to use instead of PropertyEditors. */
+	/** 使用Spring converonservice来代替PropertyEditors。 */
 	@Nullable
 	private ConversionService conversionService;
 
@@ -1152,10 +1154,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * and populate bean instances.
 	 * <p>The default implementation delegates to {@link #registerCustomEditors}.
 	 * Can be overridden in subclasses.
+	 *
+	 * 用这个工厂将给定的BeanWrapper使用注册的定制编辑器初始化
+	 * 被BeanWrappers调用将创建并填充bean实例。
+	 * 默认实现委托给{@link #registerCustomEditors}。可以在子类中重写。
+	 *
 	 * @param bw the BeanWrapper to initialize
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
+		//设置类型编译器
 		bw.setConversionService(getConversionService());
+		//注册定制的编译器
 		registerCustomEditors(bw);
 	}
 
@@ -1171,11 +1180,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		PropertyEditorRegistrySupport registrySupport =
 				(registry instanceof PropertyEditorRegistrySupport ? (PropertyEditorRegistrySupport) registry : null);
 		if (registrySupport != null) {
+			//激活使用配置的编辑器
 			registrySupport.useConfigValueEditors();
 		}
 		if (!this.propertyEditorRegistrars.isEmpty()) {
 			for (PropertyEditorRegistrar registrar : this.propertyEditorRegistrars) {
 				try {
+					//注册编译器
 					registrar.registerCustomEditors(registry);
 				}
 				catch (BeanCreationException ex) {
@@ -1361,6 +1372,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * Resolve the bean class for the specified bean definition,
 	 * resolving a bean class name into a Class reference (if necessary)
 	 * and storing the resolved Class in the bean definition for further use.
+	 *
+	 * 为指定的bean定义解析bean类,将bean类名称解析为Class引用（如果需要）并将解析后的Class存储在bean定义中以备将来使用。
+	 *
 	 * @param mbd the merged bean definition to determine the class for
 	 * @param beanName the name of the bean (for error handling purposes)
 	 * @param typesToMatch the types to match in case of internal type matching purposes
@@ -1374,6 +1388,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 		try {
 			if (mbd.hasBeanClass()) {
+				//如果bean定义解析类有bean对象对应的class则返回对应的class对象
 				return mbd.getBeanClass();
 			}
 			if (System.getSecurityManager() != null) {
@@ -1399,7 +1414,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private Class<?> doResolveBeanClass(RootBeanDefinition mbd, Class<?>... typesToMatch)
 			throws ClassNotFoundException {
-
+		/**
+		 * 获取类加载器
+		 */
 		ClassLoader beanClassLoader = getBeanClassLoader();
 		ClassLoader dynamicLoader = beanClassLoader;
 		boolean freshResolve = false;
@@ -1419,12 +1436,16 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				}
 			}
 		}
-
+		/**
+		 * 获取bean对应的类名称
+		 */
 		String className = mbd.getBeanClassName();
 		if (className != null) {
+			//返回解析后的值
 			Object evaluated = evaluateBeanDefinitionString(className, mbd);
 			if (!className.equals(evaluated)) {
 				// A dynamically resolved expression, supported as of 4.2...
+				//从4.2开始支持动态解析表达式
 				if (evaluated instanceof Class) {
 					return (Class<?>) evaluated;
 				}
@@ -1460,6 +1481,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Evaluate the given String as contained in a bean definition,
 	 * potentially resolving it as an expression.
+	 *
+	 * 计算bean定义中包含的给定String,可能将其解析为表达式。
+	 *
 	 * @param value the value to check
 	 * @param beanDefinition the bean definition that the value comes from
 	 * @return the resolved value
@@ -1468,11 +1492,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	protected Object evaluateBeanDefinitionString(@Nullable String value, @Nullable BeanDefinition beanDefinition) {
 		if (this.beanExpressionResolver == null) {
+			//bean表达式解析策略为空则之间返回对应的值
 			return value;
 		}
 
 		Scope scope = null;
 		if (beanDefinition != null) {
+			//bean对应的作用域
 			String scopeName = beanDefinition.getScope();
 			if (scopeName != null) {
 				scope = getRegisteredScope(scopeName);

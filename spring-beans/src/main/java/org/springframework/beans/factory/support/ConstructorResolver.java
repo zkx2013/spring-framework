@@ -377,27 +377,33 @@ class ConstructorResolver {
 	public BeanWrapper instantiateUsingFactoryMethod(
 			String beanName, RootBeanDefinition mbd, @Nullable Object[] explicitArgs) {
 
+		//创建无包装类的BeanWrapperImpl对象
 		BeanWrapperImpl bw = new BeanWrapperImpl();
 		this.beanFactory.initBeanWrapper(bw);
-
+		//工厂对象
 		Object factoryBean;
+		//工厂对象的class
 		Class<?> factoryClass;
 		boolean isStatic;
-
+		//获取工厂bean的名字
 		String factoryBeanName = mbd.getFactoryBeanName();
-		if (factoryBeanName != null) {
+		if (factoryBeanName != null) {//存在工厂对象
 			if (factoryBeanName.equals(beanName)) {
+				//如果工厂对象的名字和bean对象的名字一样,则抛出异常
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
 			}
+			//获取工厂对象
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
+				//ben对象是单例并且已经创建,则抛出异常
 				throw new ImplicitlyAppearedSingletonException();
 			}
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		}
 		else {
+			//不存在工厂对象,则是一个静态的工厂方法。
 			// It's a static factory method on the bean class.
 			if (!mbd.hasBeanClass()) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
@@ -407,9 +413,10 @@ class ConstructorResolver {
 			factoryClass = mbd.getBeanClass();
 			isStatic = true;
 		}
-
+		//要使用的工厂方法
 		Method factoryMethodToUse = null;
 		ArgumentsHolder argsHolderToUse = null;
+		//创建对象需要的参数
 		Object[] argsToUse = null;
 
 		if (explicitArgs != null) {

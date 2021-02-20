@@ -118,7 +118,9 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 * @param object object wrapped by this accessor
 	 */
 	protected AbstractNestablePropertyAccessor(Object object) {
+		//注册默认的编辑器(激活编译器)
 		registerDefaultEditors();
+		//设置包装对象
 		setWrappedInstance(object);
 	}
 
@@ -177,6 +179,9 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	/**
 	 * Switch the target object, replacing the cached introspection results only
 	 * if the class of the new object is different to that of the replaced object.
+	 *
+	 * 切换目标对象,如果新对象的类与被替换对象的类不同,则只替换缓存的内省结果
+	 *
 	 * @param object the new target object
 	 */
 	public void setWrappedInstance(Object object) {
@@ -187,15 +192,20 @@ public abstract class AbstractNestablePropertyAccessor extends AbstractPropertyA
 	 * Switch the target object, replacing the cached introspection results only
 	 * if the class of the new object is different to that of the replaced object.
 	 * @param object the new target object
-	 * @param nestedPath the nested path of the object
+	 * @param nestedPath the nested path of the object 对象的嵌套路径
 	 * @param rootObject the root object at the top of the path
 	 */
 	public void setWrappedInstance(Object object, @Nullable String nestedPath, @Nullable Object rootObject) {
+		//目标对象的判空处理
 		this.wrappedObject = ObjectUtils.unwrapOptional(object);
 		Assert.notNull(this.wrappedObject, "Target object must not be null");
+		//设置嵌套路径
 		this.nestedPath = (nestedPath != null ? nestedPath : "");
+		//设置根对象
 		this.rootObject = (!this.nestedPath.isEmpty() ? rootObject : this.wrappedObject);
+		//嵌套属性读取器
 		this.nestedPropertyAccessors = null;
+		//类型转换委托器
 		this.typeConverterDelegate = new TypeConverterDelegate(this, this.wrappedObject);
 	}
 
